@@ -2,11 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Linq;
+using System.Text;
+using System.Web;
+using System.Net;
+using System.IO;
 
 
-public class DataObject
+
+
+public class CallApi
 {
-    public string Name { get; set; }
+    private const string URL = "https://api.hgbrasil.com/finance";
+    private string urlParameters = "?key=9f40c222";
+    private string stockParameters = "symbol=";
 }
 
 public class Functions
@@ -34,6 +43,21 @@ class MainClass
                 Console.WriteLine("Usagename: prototype <PETR4> <num_max> <num_min>");
                 return 1;
             }
+
+        HttpClient client = new HttpClient();
+        client.BaseAddress = new Uri(URL);
+
+        // Add an Accept header for JSON format.
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        HttpResponseMessage response = client.GetAsync().Result;  // Blocking call! Program will wait here until a response is received or a timeout occurs.
+
+        Console.WriteLine(response);
+
+        //Make any other calls using HttpClient here.
+
+        //Dispose once all HttpClient calls are complete. This is not necessary if the containing object will be disposed of; for example in this case the HttpClient instance will be disposed automatically when the application terminates so the following call is superfluous.
+        client.Dispose();
 
         // Convert values of max and min
         decimal num_max;
