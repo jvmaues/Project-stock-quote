@@ -56,7 +56,8 @@ namespace ConsoleStock
                 //message setting
                 message.From = new MailAddress("mauesdevtest@gmail.com");
                 message.To.Add(new MailAddress("jvmaues@gmail.com"));
-
+                message.To.Add(new MailAddress("pedro.alpis @gmail.com"));
+                
                 message.Subject = "Test";
                 message.IsBodyHtml = false;
                 message.Body = sendmessage;
