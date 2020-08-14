@@ -20,7 +20,7 @@ in the directory
 
 C:\Users\joaomaues\Documents\Projetos\inoa\Project-stock-quote\ConsoleStock\bin\Debug>
 
-run the command: ConsoleQuote <STOCK> <MAX> <MIN>
+run the command: ConsoleQuote.exe <STOCK> <MAX> <MIN>
 
 STOCK = Stock you want track
 MAX = the max value of stock
@@ -28,4 +28,4 @@ MIN = the min value of stock
 
 ### Example
 
-PETR4 24,45 20,34
+ConsoleQuote.exe PETR4 24,45 20,34
