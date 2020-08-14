@@ -9,6 +9,7 @@ using System.IO;
 using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using Newtonsoft.Json;
+using Microsoft.SqlServer.Server;
 
 namespace ConsoleStock
 {
@@ -22,51 +23,91 @@ namespace ConsoleStock
             return msg;
         }
 
-        public static async Task<string> GetStock(string url)
+        public static async Task<string> GetStock(string url, string urlquote)
         {
-            string text = await new System.Net.WebClient().DownloadStringTaskAsync(url);
+            var httpClient = new HttpClient();
+            var request1 = new HttpRequestMessage(HttpMethod.Post, url);
+            var response = await httpClient.SendAsync(request1);
+            var contents = await response.Content.ReadAsStringAsync();
 
-            return text;
+            var request2 = new HttpRequestMessage(HttpMethod.Get, urlquote);
+            var response2 = await httpClient.SendAsync(request2);
+            var contents2 = await response2.Content.ReadAsStringAsync();
+            return contents2;
+        }
+
+        public static string PostLogin()
+        {
+            try
+            {
+                String server = "https://webfeeder.cedrotech.com";
+                String login = "jvmaues@gmail.com";
+                String password = "maues012";
+                String urlParameter = "http://" + server + "/SignIn?login=" + login + "&password=" + password;
+
+                return urlParameter;
+            }
+            catch (Exception e)
+            {
+                return e.ToString();
+            }
+           
         }
 
         public static string GetURL(string symbol)
         {
-            string url_standard = "https://api.hgbrasil.com/finance/stock_price?key=9f40c222&symbol=";
+            //string url_standard = "https://api.hgbrasil.com/finance/stock_price?key=9f40c222&symbol=";
+            //string url_standard = "/services/quotes/quote/"
+            //string url = url_standard + symbol;
 
-            string url = url_standard + symbol;
+            String server = "https://webfeeder.cedrotech.com";
+            String login = "jvmaues@gmail.com";
+            String password = "maues012";
+            String urlParameter = "http://" + server + "/SignIn?login=" + login + "&password=" + password;
 
-            return url;
+            return urlParameter;
+        }
+
+        public static ConfigSmtp HandleConfigJson()
+        {
+            using (StreamReader r = new StreamReader("../../configSmtp.json"))
+            {
+                var json = r.ReadToEnd();
+                ConfigSmtp config = JsonConvert.DeserializeObject<ConfigSmtp>(json);
+                return config;
+            }
+            
         }
         
 
-        public static Root HandleResponse(string response, string symbol)
+        public static Quote HandleResponse(string response)
         {
-            string temp = response.Replace(symbol, "stock");
-            Root handledResponse = JsonConvert.DeserializeObject<Root>(temp);
+  
+            Quote handledResponse = JsonConvert.DeserializeObject<Quote>(response);
 
             return handledResponse;
+            
         }
 
-        public static void SendEmail(string sendmessage)
+        public static void SendEmail(string sendmessage, ConfigSmtp config)
         {
             try
             {
                 MailMessage message = new MailMessage();
                 SmtpClient smtp = new SmtpClient();
                 //message setting
-                message.From = new MailAddress("mauesdevtest@gmail.com");
-                message.To.Add(new MailAddress("jvmaues@gmail.com"));
-                message.To.Add(new MailAddress("pedro.alpis @gmail.com"));
+                message.From = new MailAddress(config.emailcredencial);
+                message.To.Add(new MailAddress(config.email));
                 
-                message.Subject = "Test";
+                message.Subject = "Alert Quote";
                 message.IsBodyHtml = false;
                 message.Body = sendmessage;
                 //smtp setting
-                smtp.Port = 587;
-                smtp.Host = "smtp.gmail.com";
+                smtp.Port = config.port;
+                smtp.Host = config.host;
                 smtp.EnableSsl = true;
                 smtp.UseDefaultCredentials = false;
-                smtp.Credentials = new NetworkCredential("mauesdevtest@gmail.com", "devtest318");
+                smtp.Credentials = new NetworkCredential(config.emailcredencial, config.password);
                 smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
                 smtp.Send(message);
             }

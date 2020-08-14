@@ -43,65 +43,68 @@ namespace ConsoleStock
                 // Convert values of max quote and min quote
                 double num_max;
                 double num_min;
-                bool test_max = double.TryParse(args[1], out num_max);
-                bool teste_min = double.TryParse(args[2], out num_min);
-
-                bool condition = false;
-
-                string response;
-
-                string name;
-                double price;
-                string updated_at;
+                double.TryParse(args[1], out num_max);
+                double.TryParse(args[2], out num_min);
 
                 //Print Result
                 Console.WriteLine($"The stock {symbol} is being tracked.");
                 Console.WriteLine($"The max price is {num_max} and the min price is {num_min}.");
 
-                do
-                {
-                    Console.WriteLine($"The stock {symbol} is being tracking.");
+                string server = "webfeeder.cedrotech.com";
+                string login = "jvmaues@gmail.com";
+                string password = "maues012";
+                string urlParameter = "http://" + server + "/SignIn?login=" + login + "&password=" + password;
 
-                    //Get Stock data
-                    Task<string> task = Function.GetStock(url);
+                
 
-                    response = task.Result;
+                
+                while(true) {
+                    double price;
+                    bool condition = false;
+                    do
+                    {
+                        string urlquote_base = "http://webfeeder.cedrotech.com/services/quotes/quote/";
 
-                    //Handle response
-                    Root handledResponse = Function.HandleResponse(response, symbol);
+                        string urlquote = urlquote_base + symbol;
 
-                    name = handledResponse.results.stock.name;
-                    price = handledResponse.results.stock.price;
-                    updated_at = handledResponse.results.stock.updated_at;
+                        //Getting stock response
+                        Task<string> resp = Function.GetStock(urlParameter, urlquote);
 
-                    condition = !(num_max < price | num_min > price);
-                    Console.WriteLine(condition);
-                    Console.WriteLine(price);
-                    Console.WriteLine(num_max);
+                        string response = resp.Result;
 
-                    //time sleep
-                    Thread.Sleep(5000);
+                        Quote handledResponse = Function.HandleResponse(response);
 
-                } while (condition);
+                        price = handledResponse.lastTrade;
 
-                //handling price
+                        condition = !(num_max < price | num_min > price);
 
-                string msgemail;
+                        //time sleep
+                        Thread.Sleep(120000);
+                        Console.WriteLine($"The stock {symbol} is being tracking.");
 
-                if (num_max < price)
-                {
-                    msgemail = "Coe pedrin pode vender a ação trackada!";
+                    } while (condition);
+
+                    //handling alert message
+
+                    string msgemail;
+
+                    if (num_max < price)
+                    {
+                        msgemail = $"O papel {symbol} pode ser vendido no valor de {price}.";
+                    }
+                    else
+                    {
+                        msgemail = $"O papel {symbol} pode ser comprado no valor de {price}.";
+                    }
+
+                    //handle ConfigSmtp
+                    ConfigSmtp config = Function.HandleConfigJson();
+
+                    //Send email;
+                    Function.SendEmail(msgemail, config);
+
+                    
                 }
-                else
-                {
-                    msgemail = "Coe pedrin pode comprar a ação trackada!";
-                }
-
-                //Send email;
-                Function.SendEmail(msgemail);
-
-
-                Console.ReadLine();
                 return 0;
             }
 

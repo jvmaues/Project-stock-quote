@@ -1,0 +1,7 @@
+{
+  "email": "jvmaues@gmail.com",
+  "port": 587,
+  "host": "smtp.gmail.com",
+  "emailcredencial": "mauesdevtest@gmail.com",
+  "password": "devtest318"
+}
