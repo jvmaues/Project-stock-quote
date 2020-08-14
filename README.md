@@ -1,6 +1,6 @@
-# Project-stock-quote-alert(ConsoleQuote)
+# Project-stock-quote-alert(ConsoleStock)
 
-ConsoleQuote is a program that monitors ibovespa stocks and triggers alerts to the user.
+ConsoleStoke is a program that monitors ibovespa stocks and triggers alerts to the user.
 
 ## Configure the smtp server
 
@@ -20,7 +20,7 @@ in the directory
 
 C:\Users\joaomaues\Documents\Projetos\inoa\Project-stock-quote\ConsoleStock\bin\Debug>
 
-run the command: ConsoleQuote.exe <STOCK> <MAX> <MIN>
+run the command: ConsoleStoke.exe <STOCK> <MAX> <MIN>
 
 STOCK = Stock you want track
 MAX = the max value of stock
@@ -28,4 +28,4 @@ MIN = the min value of stock
 
 ### Example
 
-ConsoleQuote.exe PETR4 24,45 20,34
+ConsoleStoke.exe PETR4 24,45 20,34
